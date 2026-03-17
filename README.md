@@ -6,6 +6,39 @@
 ## General
 This is a Windows app (based on Electron) that listens to events in your Dota 2 game and plays a sound to remind you of important timings, such as bounty rune spawns or stack.
 
+## Architecture
+
+```mermaid
+flowchart TD
+    D2["🎮 Dota 2 Client\n(Gamestate Integration)"]
+
+    subgraph Electron["Electron App"]
+        Server["server.js\nHTTP Server :29301"]
+        Main["main.js\nMain Process\n(window, auto-update)"]
+        Game["game/game.js\nGame Logic\n(reminder checks)"]
+        Store["store/store.js\nPersistence\n(electron-store)"]
+        Sound["helpers/soundPlay.js\nAudio Queue"]
+        Preload["preload.js\nIPC Bridge"]
+
+        subgraph Renderer["Renderer Process"]
+            UI["home/home.html\nSettings UI\n(toggles + delays)"]
+        end
+    end
+
+    Audio["🔊 Audio Output\n(afplay / PowerShell)"]
+
+    D2 -- "HTTP POST (JSON)" --> Server
+    Server -- "game events" --> Game
+    Game -- "read settings" --> Store
+    Game -- "play reminder" --> Sound
+    Sound --> Audio
+
+    Main --> Server
+    Main --> Preload
+    Preload -- "IPC (contextBridge)" --> UI
+    UI -- "save settings" --> Store
+```
+
 ## Features
 
 - Automatically monitors your game status.
