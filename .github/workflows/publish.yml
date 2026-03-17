@@ -1,0 +1,47 @@
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Bump patch version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npm version patch --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore: bump version [skip ci]"
+          git push
+        shell: bash
+
+      - name: Create config-envs.js
+        run: |
+          echo "const ANALYTICS_API = '${{ secrets.ANALYTICS_API }}';" > config-envs.js
+          echo "const MEASUREMENT_ID = '${{ secrets.MEASUREMENT_ID }}';" >> config-envs.js
+          echo "module.exports = { ANALYTICS_API, MEASUREMENT_ID };" >> config-envs.js
+        shell: bash
+
+      - name: Publish
+        run: npm run publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
