@@ -1,7 +1,11 @@
 const Store = require('electron-store');
 
-
-// string because we are storing a json object
+// Two stores are used:
+//   store     — reminder settings ({ active, delay } objects serialised as JSON strings)
+//   userStore — flat user preferences (volume, clientId) stored as raw values
+//
+// Values in `store` are JSON-stringified so electron-store's schema can stay
+// simple (type: 'string') while still holding structured objects at runtime.
 const schema = {
 	stack: {
 		type: 'string',

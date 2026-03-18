@@ -1,343 +1,114 @@
-const sound = require("../helpers/soundPlay.js");
-const path = require("path");
-const store = require("../store/store.js");
+const path = require("path")
+const sound = require("../helpers/soundPlay.js")
+const store = require("../store/store.js")
+const state = require("./gameState.js")
+const reminders = require("./reminders.js")
+const { IDLE_TIMEOUT_SECONDS, GAME_CHECK_INTERVAL_MS } = require("./constants.js")
 
-let LAST_CALL_BUY_WARDS = 0
-let LAST_CALL_TOWER_DENY = 0
-let DAYTIME_CALLED = false
-let NIGHT_CALLED = false
-let LAST_GAME_TIME = 0
-let STORE_DATA = store.getAllData()
-let IS_GAME_RUNNING = null
-let LAST_TIME_EVENT_RECEIVED = null
-let VOLUME = store.handleUserStoreGet(null, "volume")
-let PAST_EVENTS = []
-let ROSHAN_DEAD = null
-let AEGIS_PICKED = null
+// --- Game session tracking ---
 
-
-const isGameRunning = () => {
-  return IS_GAME_RUNNING
-}
+const isGameRunning = () => state.isRunning
 
 const checkForGameRunning = () => {
-  const secondsIddle = 45
-
-  if (!LAST_TIME_EVENT_RECEIVED) {
+  // Start a polling interval the first time an event is received.
+  // The interval clears itself once the game goes idle.
+  if (!state.lastEventReceivedAt) {
     const intervalId = setInterval(() => {
-      const timeNow = Math.floor(new Date().getTime() / 1000);
+      const timeNow = Math.floor(Date.now() / 1000)
 
-      if ((LAST_TIME_EVENT_RECEIVED + secondsIddle) < timeNow) {
-        IS_GAME_RUNNING = false
-        LAST_TIME_EVENT_RECEIVED = null;
-        PAST_EVENTS = []
-        ROSHAN_DEAD = null
-        AEGIS_PICKED = null
+      if ((state.lastEventReceivedAt + IDLE_TIMEOUT_SECONDS) < timeNow) {
+        state.isRunning = false
+        state.lastEventReceivedAt = null
+        state.pastEvents = []
+        state.roshanDeadAt = null
+        state.aegisPickedAt = null
         clearInterval(intervalId)
       }
-    }, 20000)
+    }, GAME_CHECK_INTERVAL_MS)
   }
 
-  LAST_TIME_EVENT_RECEIVED = Math.floor(new Date().getTime() / 1000);
-  IS_GAME_RUNNING = true
+  state.lastEventReceivedAt = Math.floor(Date.now() / 1000)
+  state.isRunning = true
 }
 
 const playTestSound = () => {
-  const filePath = path.join(__dirname, "../sound/test-sound.mp3");
-  sound.play(filePath, VOLUME);
+  const filePath = path.join(__dirname, "../sound/test-sound.mp3")
+  sound.play(filePath, state.volume)
 }
 
-function storeChangeCallback(newValue, _oldValue) {
-  const parsedNewValue = {}
-  for (const key in newValue) {
-    parsedNewValue[key] = JSON.parse(newValue[key])
-  }
-  STORE_DATA = parsedNewValue
-}
-
-function volumeChangeCallback(newValue, _oldValue) {
-  VOLUME = newValue
-}
-
-const checkForTowerDeny = (gameTime, buildings) => {
-  if (LAST_CALL_TOWER_DENY > gameTime) LAST_CALL_TOWER_DENY = 0
-  const team = buildings.dire ? "dire" : "radiant"
-  const timeBetweenCalls = 15
-
-  for (const building in buildings[team]) {
-    if (building.includes('tower') && (LAST_CALL_TOWER_DENY + timeBetweenCalls) <= gameTime) {
-      const lane = building.split('_')[3]
-      const maxHealth = buildings[team][building].max_health
-      const currentHealth = buildings[team][building].health
-
-      const isDeniable = currentHealth <= (maxHealth * 0.1)
-      if (isDeniable) {
-        const filePath = path.join(__dirname, `../sound/${lane}-tower.mp3`);
-        sound.play(filePath, VOLUME);
-        LAST_CALL_TOWER_DENY = gameTime
-      }
-
-    }
-  }
-
-}
-
-const checkForDaytime = (isDaytime) => {
-  if (isDaytime && !DAYTIME_CALLED) {
-    const filePath = path.join(__dirname, "../sound/daytime.mp3");
-    sound.play(filePath, VOLUME);
-    DAYTIME_CALLED = true
-    NIGHT_CALLED = false
-  } else if (!isDaytime && !NIGHT_CALLED) {
-    const filePath = path.join(__dirname, "../sound/nighttime.mp3");
-    sound.play(filePath, VOLUME);
-    NIGHT_CALLED = true
-    DAYTIME_CALLED = false
-  }
-}
-
-const checkForRoshanWarnTime = (gameTime, deathTime, isTurbo) => {
-  let roshanMin = 469
-  let roshanMax = 659
-
-  if (isTurbo) {
-    roshanMin = roshanMin/2
-    roshanMax = roshanMax/2
-  }
-
-  if (deathTime + roshanMin === gameTime) {
-    const filePath = path.join(__dirname, "../sound/roshanMin.mp3");
-    sound.play(filePath, VOLUME);
-  }
-  else if (deathTime + roshanMax === gameTime) {
-    const filePath = path.join(__dirname, "../sound/roshanMax.mp3");
-    sound.play(filePath, VOLUME);
-  } else if (deathTime + roshanMax < gameTime) {
-    ROSHAN_DEAD = null
-  }
-}
-
-checkForAegisWarnTime = (gameTime, deathTime, isTurbo) => {
-  let aegis2minWarnTime = 180
-  let aegis30sWarnTime = 271
-  let aegis10sWarnTime = 291
-  let aegisExpiredTime = 302
-
-  if (isTurbo) {
-    aegis2minWarnTime -= 60
-    aegis30sWarnTime -= 60
-    aegis10sWarnTime -= 60
-    aegisExpiredTime -= 60
-  }
-
-  if (deathTime + aegis2minWarnTime === gameTime) {
-    const filePath = path.join(__dirname, "../sound/aegis2min.mp3");
-    sound.play(filePath, VOLUME);
-  }
-  else if (deathTime + aegis30sWarnTime === gameTime) {
-    const filePath = path.join(__dirname, "../sound/aegis30s.mp3");
-    sound.play(filePath, VOLUME);
-  }
-  else if (deathTime + aegis10sWarnTime === gameTime) {
-    const filePath = path.join(__dirname, "../sound/aegis10s.mp3");
-    sound.play(filePath, VOLUME);
-  }
-  else if (deathTime + aegisExpiredTime === gameTime) {
-    const filePath = path.join(__dirname, "../sound/aegisExpired.mp3");
-    sound.play(filePath, VOLUME);
-  } else if (deathTime + aegisExpiredTime < gameTime) {
-    AEGIS_PICKED = null
-  }
-}
-
-const checkForStack = (gameTime) => {
-  const stackTime = 60
-  const stackDelay = store.handleStoreGet(null, "stack").delay
-  const stackAlertTime = stackTime - stackDelay
-
-  if ((gameTime - stackAlertTime) % stackTime === 0) {
-    const filePath = path.join(__dirname, "../sound/stack.mp3");
-    sound.play(filePath, VOLUME);
-  }
-}
-
-const checkForMidRunes = (gameTime) => {
-  const midRunesTime = 120;
-  const midRunesDelay = store.handleStoreGet(null, "midrunes").delay
-  const midRunesAlertTime = midRunesTime - midRunesDelay
-
-  if ((gameTime - midRunesAlertTime) % midRunesTime === 0) {
-    const filePath = path.join(__dirname, "../sound/mid-rune.mp3");
-    sound.play(filePath, VOLUME);
-  }
-}
-
-const checkForFirstTormentor = (gameTime) => {
-  const firstTormentorSpawnTime = 1200;
-
-  if (firstTormentorSpawnTime === gameTime) {
-    const filePath = path.join(__dirname, "../sound/tormentor.mp3");
-    sound.play(filePath, VOLUME);
-  }
-}
-
-const checkForWisdomRunes = (gameTime) => {
-  const wisdomRunesTime = 420;
-  const wisdomRunesDelay = store.handleStoreGet(null, "wisdomrunes").delay
-  const wisdomRunesAlertTime = wisdomRunesTime - wisdomRunesDelay
-
-  if ((gameTime - wisdomRunesAlertTime) % wisdomRunesTime === 0) {
-    const filePath = path.join(__dirname, "../sound/wisdom-rune.mp3");
-    sound.play(filePath, VOLUME);
-  }
-}
-
-const checkForLotus = (gameTime, isTurbo) => {
-  let lotusTime = 180;
-  if (isTurbo) lotusTime = 90
-  const lotusDelay = store.handleStoreGet(null, "lotus").delay
-  const lotusAlertTime = lotusTime - lotusDelay
-
-  if ((gameTime - lotusAlertTime) % lotusTime === 0) {
-    const filePath = path.join(__dirname, "../sound/lotus.mp3");
-    sound.play(filePath, VOLUME);
-  }
-}
-
-const checkForBountyRunes = (gameTime) => {
-  const bountyRunesTime = 180;
-  const bountyRunesDelay = store.handleStoreGet(null, "bountyrunes").delay
-  const bountyRunesAlertTime = bountyRunesTime - bountyRunesDelay
-
-  if ((gameTime - bountyRunesAlertTime) % bountyRunesTime === 0) {
-    const filePath = path.join(__dirname, "../sound/bounty-runes.mp3");
-    sound.play(filePath, VOLUME);
-  }
-}
-
-const checkNeutralItems = (gameTime, isTurbo) => {
-  let neutralItemsTime = [420, 1020, 1620, 2200, 3600]
-  if (isTurbo) {
-    neutralItemsTimeTurbo = neutralItemsTime.map(time => time / 2)
-  }
-
-  for (let i = 0; i < neutralItemsTime.length; i++) {
-    if (gameTime === neutralItemsTime[i]) {
-      const filePath = path.join(__dirname, `../sound/neutralTier${i + 1}.mp3`);
-      sound.play(filePath, VOLUME);
-    }
-  }
-}
-
-const checkForSmoke = (gameTime) => {
-  const smokeTime = 420
-  const smokeDelay = store.handleStoreGet(null, "smoke").delay
-  const smokeAlertTime = smokeTime - smokeDelay
-
-  if ((gameTime - smokeAlertTime) % smokeTime === 0) {
-    const filePath = path.join(__dirname, "../sound/smoke.mp3");
-    sound.play(filePath, VOLUME);
-  }
-
-}
-
-const checkForWards = (gameTime, wardCd) => {
-  if (LAST_CALL_BUY_WARDS > gameTime) LAST_CALL_BUY_WARDS = 0
-  const timeBetweenCalls = 30
-
-  if (wardCd === 0 && (LAST_CALL_BUY_WARDS + timeBetweenCalls) <= gameTime) {
-    const filePath = path.join(__dirname, "../sound/wards.mp3");
-    sound.play(filePath, VOLUME);
-    LAST_CALL_BUY_WARDS = gameTime
-  }
-
-}
+// --- Main event handler ---
 
 const onNewGameEvent = async (gameEvent) => {
+  if (!gameEvent.map || gameEvent.map.game_state !== "DOTA_GAMERULES_STATE_GAME_IN_PROGRESS") return
 
-  if (gameEvent.map && gameEvent.map.game_state === 'DOTA_GAMERULES_STATE_GAME_IN_PROGRESS') {
-    const gameTime = gameEvent.map.clock_time
-    const wardsPurchaseCd = gameEvent.map.ward_purchase_cooldown
-    const isDaytime = gameEvent.map.daytime
-    const buildings = gameEvent.buildings
+  const gameTime       = gameEvent.map.clock_time
+  const wardsPurchaseCd = gameEvent.map.ward_purchase_cooldown
+  const isDaytime      = gameEvent.map.daytime
+  const buildings      = gameEvent.buildings
 
+  // Deduplicate events from the GSI stream (Dota resends recent events each tick)
+  const newEvents = gameEvent.events.filter(ev =>
+    !state.pastEvents.some(past =>
+      `${past.event_type}-${past.game_time}` === `${ev.event_type}-${ev.game_time}`
+    )
+  )
 
-    let newEvent = null;
-    // In-game events
-    const differentEvents = gameEvent.events.filter(newEvent => {
-      return !PAST_EVENTS.some(pastEvent => {
-        return `${pastEvent.event_type}-${pastEvent.game_time}` === `${newEvent.event_type}-${newEvent.game_time}`;
-      });
-    });
-    if (differentEvents.length > 0) {
-      newEvent = differentEvents[0]
-      PAST_EVENTS.push(newEvent)
-    }
+  if (newEvents.length > 0) {
+    const newEvent = newEvents[0]
+    state.pastEvents.push(newEvent)
 
-    if (newEvent) {
-      if (newEvent.event_type === 'roshan_killed' && STORE_DATA.roshan.active) {
-        ROSHAN_DEAD = gameTime
-      } else if (newEvent.event_type === 'aegis_picked_up' && STORE_DATA.aegis.active) {
-        AEGIS_PICKED = gameTime
-      }
+    if (newEvent.event_type === "roshan_killed" && state.storeData.roshan?.active) {
+      state.roshanDeadAt = gameTime
+    } else if (newEvent.event_type === "aegis_picked_up" && state.storeData.aegis?.active) {
+      state.aegisPickedAt = gameTime
     }
-
-
-    if (LAST_GAME_TIME === gameTime) return
-    if (LAST_GAME_TIME > gameTime) LAST_GAME_TIME = 0
-    isTurbo = STORE_DATA.turbo.active
-
-    if (STORE_DATA.stack.active) {
-      checkForStack(gameTime)
-    }
-    if (STORE_DATA.midrunes.active) {
-      checkForMidRunes(gameTime)
-    }
-    if (STORE_DATA.bountyrunes.active) {
-      checkForBountyRunes(gameTime)
-    }
-    if (STORE_DATA.neutral.active) {
-      checkNeutralItems(gameTime, isTurbo)
-    }
-    if (STORE_DATA.smoke.active) {
-      checkForSmoke(gameTime)
-    }
-    if (STORE_DATA.ward.active) {
-      checkForWards(gameTime, wardsPurchaseCd)
-    }
-    if (STORE_DATA.daytime.active) {
-      checkForDaytime(isDaytime)
-    }
-    if (STORE_DATA.tower.active) {
-      checkForTowerDeny(gameTime, buildings)
-    }
-    if (STORE_DATA.wisdomrunes.active) {
-      checkForWisdomRunes(gameTime)
-    }
-    if (STORE_DATA.lotus.active) {
-      checkForLotus(gameTime, isTurbo)
-    }
-    if (STORE_DATA.tormentor.active) {
-      checkForFirstTormentor(gameTime)
-    }
-    if (ROSHAN_DEAD && STORE_DATA.roshan.active) {
-      checkForRoshanWarnTime(gameTime, ROSHAN_DEAD, isTurbo)
-    }
-    if (AEGIS_PICKED && STORE_DATA.aegis.active) {
-      checkForAegisWarnTime(gameTime, AEGIS_PICKED, isTurbo)
-    }
-
-    LAST_GAME_TIME = gameTime
   }
+
+  // Skip duplicate ticks; reset on game restart (clock rewind)
+  if (state.lastGameTime === gameTime) return
+  if (state.lastGameTime > gameTime) state.lastGameTime = 0
+
+  const isTurbo = state.storeData.turbo?.active
+
+  if (state.storeData.stack?.active)       reminders.checkForStack(gameTime)
+  if (state.storeData.midrunes?.active)    reminders.checkForMidRunes(gameTime)
+  if (state.storeData.bountyrunes?.active) reminders.checkForBountyRunes(gameTime)
+  if (state.storeData.neutral?.active)     reminders.checkNeutralItems(gameTime, isTurbo)
+  if (state.storeData.smoke?.active)       reminders.checkForSmoke(gameTime)
+  if (state.storeData.ward?.active)        reminders.checkForWards(gameTime, wardsPurchaseCd)
+  if (state.storeData.daytime?.active)     reminders.checkForDaytime(isDaytime)
+  if (state.storeData.tower?.active)       reminders.checkForTowerDeny(gameTime, buildings)
+  if (state.storeData.wisdomrunes?.active) reminders.checkForWisdomRunes(gameTime)
+  if (state.storeData.lotus?.active)       reminders.checkForLotus(gameTime, isTurbo)
+  if (state.storeData.tormentor?.active)   reminders.checkForFirstTormentor(gameTime)
+
+  if (state.roshanDeadAt && state.storeData.roshan?.active) {
+    reminders.checkForRoshanWarnTime(gameTime, state.roshanDeadAt, isTurbo)
+  }
+  if (state.aegisPickedAt && state.storeData.aegis?.active) {
+    reminders.checkForAegisWarnTime(gameTime, state.aegisPickedAt, isTurbo)
+  }
+
+  state.lastGameTime = gameTime
 }
 
-store.onStoreChange(storeChangeCallback)
-store.onVolumeChange(volumeChangeCallback)
+// --- Keep live state in sync with user settings changes ---
+
+store.onStoreChange((newValue) => {
+  const parsed = {}
+  for (const key in newValue) {
+    parsed[key] = JSON.parse(newValue[key])
+  }
+  state.storeData = parsed
+})
+
+store.onVolumeChange((newValue) => {
+  state.volume = newValue
+})
 
 module.exports = {
   onNewGameEvent,
   checkForGameRunning,
   isGameRunning,
-  playTestSound
+  playTestSound,
 }
-
