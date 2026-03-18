@@ -1,0 +1,184 @@
+/* ═══════════════════════════════════════════════════════════════
+   Layout — base reset, two-panel grimoire, panels, divider,
+   panel headers, and the reminder list on the left panel.
+════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 14px;
+  line-height: 1.4;
+  background: var(--wood-dark);
+}
+
+/* ── Two-panel wrapper ──────────────────────────────────────── */
+.grimoire {
+  display: flex;
+  height: 100vh;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wood-mid) transparent;
+}
+.panel::-webkit-scrollbar       { width: 5px; }
+.panel::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb { background: var(--wood-mid); border-radius: 3px; }
+
+/* Left panel — reminder toggles, warm dark parchment */
+.panel--left {
+  flex: 0 0 310px;
+  background-color: var(--parchment-left);
+  background-image:
+    radial-gradient(ellipse at 15%  8%, rgba(220,190,110,0.45) 0%, transparent 48%),
+    radial-gradient(ellipse at 85% 92%, rgba(130,90,30,0.35)   0%, transparent 48%),
+    repeating-linear-gradient(
+      0deg,
+      transparent           0px, transparent           30px,
+      rgba(0,0,0,0.022)    30px, rgba(0,0,0,0.022)    31px
+    );
+}
+
+/* Right panel — settings, slightly brighter parchment */
+.panel--right {
+  flex: 1;
+  background-color: var(--parchment-right);
+  background-image:
+    radial-gradient(ellipse at 82% 10%, rgba(220,195,120,0.4)  0%, transparent 50%),
+    radial-gradient(ellipse at 18% 90%, rgba(130,90,30,0.30)   0%, transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      transparent           0px, transparent           30px,
+      rgba(0,0,0,0.018)    30px, rgba(0,0,0,0.018)    31px
+    );
+}
+
+/* ── Wood divider ───────────────────────────────────────────── */
+.wood-divider {
+  flex: 0 0 10px;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent          0px, transparent          10px,
+      rgba(0,0,0,0.06)    10px, rgba(0,0,0,0.06)    11px
+    ),
+    linear-gradient(to right, #1e0e02, #3a2810, #5a3a18, #3a2810, #1e0e02);
+  box-shadow:
+    inset 3px  0 6px rgba(0,0,0,0.5),
+    inset -3px 0 6px rgba(0,0,0,0.5);
+}
+
+/* ── Panel headers ──────────────────────────────────────────── */
+.panel-header {
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255,220,140,0.45);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.header-rule {
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--wood-dark)  20%,
+    var(--wood-mid)   50%,
+    var(--wood-dark)  80%,
+    transparent
+  );
+}
+
+/* ── Turbo row (top of reminder list, highlighted) ──────────── */
+.turbo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 7px 12px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, rgba(58,40,16,0.14), rgba(58,40,16,0.07), rgba(58,40,16,0.14));
+  border: 1px solid rgba(58,40,16,0.22);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.reminder-name--turbo {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+/* ── Section rule ───────────────────────────────────────────── */
+.section-rule {
+  height: 1px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--wood-mid)   30%,
+    var(--wood-light) 50%,
+    var(--wood-mid)   70%,
+    transparent
+  );
+}
+
+/* ── Reminder list rows ─────────────────────────────────────── */
+.reminder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 8px;
+  border-radius: 3px;
+  transition: background 0.18s;
+}
+.reminder-row:hover { background: rgba(58,40,16,0.09); }
+
+.rune-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  color: var(--ink-light);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.reminder-name {
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 13px;
+  color: var(--ink);
+  flex: 1;
+  line-height: 1;
+}

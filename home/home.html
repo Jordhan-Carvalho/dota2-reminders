@@ -1,271 +1,134 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- <meta
-http-equiv="Content-Security-Policy"
-content="default-src 'self'; script-src 'self'"
-/>
-<meta
-http-equiv="X-Content-Security-Policy"
-content="default-src 'self'; script-src 'self'"
-/> -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="../materialize/css/materialize.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../reset.css" />
-    <link rel="stylesheet" href="./home.css" />
-
+    <link rel="stylesheet" href="./variables.css" />
+    <link rel="stylesheet" href="./layout.css" />
+    <link rel="stylesheet" href="./toggles.css" />
+    <link rel="stylesheet" href="./controls.css" />
   </head>
   <body>
-    <!-- -------------------------------- Main ------------------------------- -->
-    <main>
-      <div class="alerts-container">
-        <div class="reminder-container">
-          <h2>Set your reminders</h2>
-          
-          <div class="checkbox-container turbo" >
-            <p>Turbo Mode</p>
-            <div class="switch">
-              <label>
-                <input type="checkbox" id="turbo-checkbox">
-                <span class="lever"></span>
-              </label>
-            </div>
-          </div>
+    <main class="grimoire">
+
+      <!-- ═══════════════════════════════════════════════
+           LEFT PANEL — Reminder Toggles
+           Rows are injected by home.js (renderReminderRows)
+      ════════════════════════════════════════════════ -->
+      <div class="panel panel--left">
+
+        <header class="panel-header">
+          <h1 class="panel-title">Dota 2 Reminders</h1>
+          <div class="header-rule"></div>
+        </header>
+
+        <div class="turbo-row">
+          <span class="rune-icon">⚡</span>
+          <span class="reminder-name reminder-name--turbo">Turbo Mode</span>
+          <label class="gem-toggle">
+            <input type="checkbox" id="turbo-checkbox" />
+            <span class="toggle-track">
+              <span class="toggle-label--off">Off</span>
+              <span class="toggle-gem"></span>
+              <span class="toggle-label--on">On</span>
+            </span>
+          </label>
         </div>
 
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="stack-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Stack</p>
-        </div>
+        <div class="section-rule"></div>
 
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="midrunes-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Mid Runes</p>
-        </div>
+        <!-- Populated at runtime by renderReminderRows() in home.js -->
+        <div class="reminder-list"></div>
 
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="bountyrunes-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Bounty Runes</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="neutral-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Neutral Items</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="smoke-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Smoke</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="ward-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Wards</p>
-        </div>
-
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="daytime-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Day/Night time</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="tower-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Tower in deny range</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="roshan-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Roshan</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="aegis-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Aegis</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="wisdomrunes-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Wisdom Runes</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="lotus-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>Lotus</p>
-        </div>
-
-        <div class="checkbox-container" >
-          <div class="switch">
-            <label>
-              Off
-              <input type="checkbox" id="tormentor-checkbox">
-              <span class="lever"></span>
-              On
-            </label>
-          </div>
-          <p>First Tormentor</p>
-        </div>
-
-        <div class="last-item-coffe"> 
+        <div class="coffee-row">
           <a href="https://www.buymeacoffee.com/jordhanrdzM" target="_blank">
-            <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=jordhanrdzM&button_colour=f99553&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" />
+            <img
+              src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=jordhanrdzM&button_colour=3a2810&font_colour=c8a96e&font_family=Lato&outline_colour=9a7a3a&coffee_colour=d4a017"
+              alt="Buy me a coffee"
+            />
           </a>
-          </div>
-      </div>
-
-      <!-- -------------------------------- Left Container ------------------------------- -->
-      <div class="left-container">
-        <div class="left-upper-container">
-          <h2 class="delay-title">Set the reminder delay:</h2>
-          <div class="settings-container">
-            <p class="delay-text">* How many seconds to trigger the alert before the actual event</p>
-            <div class="new-row">
-              <div class="input-field col s6">
-                <input id="stack-delay" type="number" class="validate" value="13" min="0" max="30">
-                <label for="stack-delay">Stack</label>
-              </div>
-              <div class="input-field col s6">
-                <input id="midrunes-delay" type="number" class="validate" value="4" min="0" max="30">
-                <label for="midrunes-delay">Mid Runes</label>
-              </div>
-  
-              <div class="input-field col s6">
-                <input id="neutral-delay" type="number" class="validate" value="1" min="0" max="30">
-                <label for="neutral-delay">Neutral Items</label>
-              </div>
-  
-              <div class="input-field col s6">
-                <input id="bountyrunes-delay" type="number" class="validate" value="2" min="0" max="30">
-                <label for="bountyrunes-delay">Bounty Runes</label>
-              </div>
-            </div>
-
-            <div class="new-row">
-              <div class="input-field col s6">
-                <input id="wisdomrunes-delay" type="number" class="validate" value="6" min="0" max="30">
-                <label for="wisdomrunes-delay">Wisdom Runes</label>
-              </div>
-              <div class="input-field col s6">
-                <input id="lotus-delay" type="number" class="validate" value="3" min="0" max="30">
-                <label for="lotus-delay">Lotus</label>
-              </div>
-            </div>
-
-          </div>
-  
-          <div class="volume-container">
-            <h2>Reminders Volume</h2>
-            <div class="volume-container-actions">
-              <a class="waves-effect waves-light btn" id="test-sound">Test Sound</a>
-              <p class="range-field">
-                <input id="volume-input" type="range" id="test5" min="0" max="0.9" step="0.1" />
-              </p>
-            </div>
-          </div>
         </div>
 
-        <div class="left-bottom-container">
-          <h2>Dota 2 Reminders v<span id="d2r-version"></span> - made with ❤ </h2>
-          <p>Make sure you have downloaded it from the the github repo. We also have an open-source discord bot server. If you enjoy it give us a star on Github!</p>
-          <p>Bugs, issues or suggestions? Join the discord channel.</p>
-          <a href="https://dota2reminders.com" target="_blank" class="waves-effect waves-light btn-small"><i class="material-icons left">home</i>Dota2Reminders.com</a>
-          <a href="https://github.com/Jordhan-Carvalho/d2r-electron" target="_blank" class="waves-effect waves-light btn-small"><i class="material-icons left">code</i>D2R GitHub</a>
-          <a href="https://discord.com/invite/maNcHKHpR3" target="_blank" class="waves-effect waves-light btn-small"><i class="material-icons left">discord</i>Discord Server</a>
-        </div>
-        https://discord.com/channels/1045782658384416779/1045782658384416782
+      </div><!-- /.panel--left -->
 
-      </div>
+      <!-- ═══════════════════════════════════════════════
+           WOOD DIVIDER
+      ════════════════════════════════════════════════ -->
+      <div class="wood-divider" aria-hidden="true"></div>
+
+      <!-- ═══════════════════════════════════════════════
+           RIGHT PANEL — Configuration
+      ════════════════════════════════════════════════ -->
+      <div class="panel panel--right">
+
+        <header class="panel-header">
+          <h1 class="panel-title">General Configuration</h1>
+          <div class="header-rule"></div>
+        </header>
+
+        <section class="config-section">
+          <h2 class="section-title">Alert Delay</h2>
+          <p class="section-hint">Seconds before the event to sound the alarm</p>
+          <div class="delay-grid">
+            <div class="stone-block">
+              <label class="stone-label" for="stack-delay">Stack</label>
+              <input class="stone-input" id="stack-delay" type="number" min="0" max="30" value="13" />
+            </div>
+            <div class="stone-block">
+              <label class="stone-label" for="midrunes-delay">Mid Runes</label>
+              <input class="stone-input" id="midrunes-delay" type="number" min="0" max="30" value="4" />
+            </div>
+            <div class="stone-block">
+              <label class="stone-label" for="bountyrunes-delay">Bounty</label>
+              <input class="stone-input" id="bountyrunes-delay" type="number" min="0" max="30" value="3" />
+            </div>
+            <div class="stone-block">
+              <label class="stone-label" for="neutral-delay">Neutrals</label>
+              <input class="stone-input" id="neutral-delay" type="number" min="0" max="30" value="0" />
+            </div>
+            <div class="stone-block">
+              <label class="stone-label" for="wisdomrunes-delay">Wisdom</label>
+              <input class="stone-input" id="wisdomrunes-delay" type="number" min="0" max="30" value="6" />
+            </div>
+            <div class="stone-block">
+              <label class="stone-label" for="lotus-delay">Lotus</label>
+              <input class="stone-input" id="lotus-delay" type="number" min="0" max="30" value="3" />
+            </div>
+          </div>
+        </section>
+
+        <section class="config-section">
+          <h2 class="section-title">Incantation Volume</h2>
+          <div class="volume-row">
+            <button class="stone-btn" id="test-sound">▶ Test Sound</button>
+            <div class="volume-slider-wrap">
+              <span class="volume-icon">🔇</span>
+              <input type="range" id="volume-input" min="0" max="0.9" step="0.1" value="0.5" />
+              <span class="volume-icon">🔊</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="config-section footer-section">
+          <div class="footer-rule"></div>
+          <p class="footer-tagline">
+            Dota 2 Reminders <span class="version-tag">v<span id="d2r-version"></span></span> — forged with ❤
+          </p>
+          <p class="footer-desc">Open source &amp; community driven. Stars welcome. Bugs or suggestions? Join the Discord.</p>
+          <div class="link-row">
+            <a href="https://dota2reminders.com" target="_blank" class="stone-btn stone-btn--sm">⚜ Website</a>
+            <a href="https://github.com/Jordhan-Carvalho/d2r-electron" target="_blank" class="stone-btn stone-btn--sm">⌨ GitHub</a>
+            <a href="https://discord.com/invite/maNcHKHpR3" target="_blank" class="stone-btn stone-btn--sm">✦ Discord</a>
+          </div>
+        </section>
+
+      </div><!-- /.panel--right -->
 
     </main>
-    <!-- --------------------------- BOTTOM ------------------------------------- -->
 
-
-    <script src="../materialize/js/materialize.min.js"></script>
     <script src="../helpers/inputmask.min.js"></script>
     <script src="./home.js"></script>
   </body>
