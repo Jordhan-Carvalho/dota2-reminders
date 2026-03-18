@@ -18,7 +18,10 @@ module.exports = {
   packagerConfig: {
     executableName: "Dota 2 Reminders",
     icon: path.join(__dirname, '/assets/dota2reminders'),
-    name: "Dota 2 Reminders"
+    name: "Dota 2 Reminders",
+    extraResource: [
+      path.join(__dirname, 'scripts.o/gamestate_integration_d2reminders.cfg'),
+    ],
   },
   rebuildConfig: {},
   makers: [
