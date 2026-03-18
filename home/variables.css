@@ -1,0 +1,20 @@
+/* ═══════════════════════════════════════════════════════════════
+   Design tokens — all colours and shared values in one place.
+   Import this file first so the other stylesheets can use vars.
+════════════════════════════════════════════════════════════════ */
+:root {
+  --parchment-left:    #b89a5e;
+  --parchment-right:   #c8a96e;
+  --wood-dark:         #3a2810;
+  --wood-mid:          #5a3a18;
+  --wood-light:        #7a5a28;
+  --gold:              #d4a017;
+  --gold-bright:       #ffd700;
+  --gold-dim:          #9a7010;
+  --stone-dark:        #1a1610;
+  --stone-surface:     #2a2218;
+  --stone-border:      #5a4a38;
+  --ink:               #2a1808;
+  --ink-light:         #5a3a1a;
+  --text-on-stone:     #c8a96e;
+}

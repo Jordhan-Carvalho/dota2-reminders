@@ -1,0 +1,263 @@
+/* ═══════════════════════════════════════════════════════════════
+   Controls — right-panel UI: stone delay blocks, volume slider,
+   stone buttons, config sections, and footer.
+════════════════════════════════════════════════════════════════ */
+
+/* ── Buy-me-a-coffee ────────────────────────────────────────── */
+.coffee-row {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 14px;
+  flex-shrink: 0;
+}
+.coffee-row img {
+  height: 34px;
+  border-radius: 4px;
+  opacity: 0.88;
+  transition: opacity 0.2s;
+}
+.coffee-row img:hover { opacity: 1; }
+
+/* ── Config section wrapper ─────────────────────────────────── */
+.config-section {
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.section-hint {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--ink-light);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+/* ── Delay grid — stone carved blocks ───────────────────────── */
+.delay-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.stone-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 6px 6px;
+  background: linear-gradient(160deg, #2e2418, #1a1610, #2a2218);
+  border: 1px solid var(--stone-border);
+  border-radius: 3px;
+  box-shadow:
+    inset 0  2px 6px rgba(0,0,0,0.68),
+    inset 0 -1px 0   rgba(110,85,50,0.14),
+    0     2px 4px    rgba(0,0,0,0.38);
+}
+
+.stone-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8a7a68;
+  margin-bottom: 3px;
+  text-align: center;
+  line-height: 1;
+}
+
+.stone-input {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  text-align: center;
+  text-shadow:
+    0 0 14px rgba(212,160,23,0.55),
+    0 0  5px rgba(212,160,23,0.28);
+  line-height: 1.1;
+  -moz-appearance: textfield;
+}
+.stone-input::-webkit-inner-spin-button,
+.stone-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ── Volume slider ──────────────────────────────────────────── */
+.volume-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.volume-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+}
+
+.volume-icon {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Track — wood texture */
+#volume-input {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 10px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent         0px, transparent         12px,
+      rgba(0,0,0,0.055)  12px, rgba(0,0,0,0.055)  13px
+    ),
+    linear-gradient(to right, #2a1a08, #4a2e10, #3a2410);
+  border-radius: 5px;
+  border: 1px solid #6a4a28;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.55);
+  outline: none;
+  cursor: pointer;
+}
+
+/* Thumb — green gem diamond */
+#volume-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: linear-gradient(135deg, #72f050 0%, #2aa018 50%, #4abe28 100%);
+  box-shadow:
+    0 0 10px rgba(80,210,50,0.80),
+    0 0  4px rgba(50,190,20,0.45);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+#volume-input::-webkit-slider-thumb:hover {
+  box-shadow:
+    0 0 16px rgba(90,230,55,0.95),
+    0 0  8px rgba(60,210,25,0.60);
+}
+#volume-input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #72f050 0%, #2aa018 50%, #4abe28 100%);
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 0 10px rgba(80,210,50,0.80);
+  cursor: pointer;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* ── Stone buttons ──────────────────────────────────────────── */
+.stone-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-on-stone);
+  background: linear-gradient(160deg, #3c3228, #242018, #3a3026);
+  border: 1px solid var(--stone-border);
+  border-radius: 3px;
+  padding: 9px 13px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1;
+  box-shadow:
+    inset 0  1px 0 rgba(255,220,160,0.07),
+    inset 0 -1px 0 rgba(0,0,0,0.28),
+    0 3px 6px rgba(0,0,0,0.42);
+  transition: color 0.18s, border-color 0.18s, box-shadow 0.18s;
+}
+.stone-btn:hover {
+  color: var(--gold-bright);
+  border-color: var(--gold-dim);
+  box-shadow:
+    inset 0  1px 0 rgba(255,220,160,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.28),
+    0 3px 6px rgba(0,0,0,0.42),
+    0 0  10px rgba(212,160,23,0.20);
+}
+.stone-btn:active {
+  box-shadow:
+    inset 0 2px 5px rgba(0,0,0,0.5),
+    0 1px 2px rgba(0,0,0,0.3);
+}
+
+.stone-btn--sm {
+  font-size: 9.5px;
+  padding: 7px 10px;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.footer-section { margin-top: auto; }
+
+.footer-rule {
+  height: 1px;
+  margin-bottom: 11px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--wood-mid)   30%,
+    var(--wood-light) 50%,
+    var(--wood-mid)   70%,
+    transparent
+  );
+}
+
+.footer-tagline {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.version-tag {
+  color: var(--ink-light);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.footer-desc {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--ink-light);
+  text-align: center;
+  margin-bottom: 11px;
+  line-height: 1.4;
+}
+
+.link-row {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
