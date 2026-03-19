@@ -39,7 +39,7 @@
 .section-hint {
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--ink-light);
   margin-bottom: 10px;
   line-height: 1.3;
@@ -248,7 +248,7 @@
 .footer-desc {
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--ink-light);
   text-align: center;
   margin-bottom: 11px;
