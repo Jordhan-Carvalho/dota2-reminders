@@ -62,18 +62,29 @@ Download the latest installer from the release server:
 
 The app receives data from Dota 2 via the [Gamestate Integration (GSI)](https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2) system.
 
-1. Download the config file: [gamestate_integration_d2reminders.cfg](https://gofile.io/d/9nD2y9)
-   _(also available at: [Mega](https://mega.nz/file/zUEQEbgY#vBTxM_nbOhYUbdruY3XleiEzpcHDZQgSj4AXlVQUXl4) | [Dropbox](https://www.dropbox.com/s/ut1nkjsk138i8rc/gamestate_integration_d2reminders.cfg?dl=0))_
+**This step is handled automatically on first launch.** The installer detects your Steam path and copies the GSI config file to the correct location. You will see a confirmation dialog when it succeeds.
 
-2. Copy it to your Dota 2 CFG folder:
+<details>
+<summary>Manual setup (if automatic installation failed)</summary>
+
+1. Locate the `gamestate_integration_d2reminders.cfg` file — it is bundled inside the installer ZIP.
+
+2. Find your Steam installation folder. The default location is:
    ```
-   Steam/steamapps/common/dota 2 beta/game/dota/cfg/gamestate_integration/
+   C:\Program Files (x86)\Steam
+   ```
+
+3. Navigate to the Dota 2 CFG folder:
+   ```
+   Steam\steamapps\common\dota 2 beta\game\dota\cfg\gamestate_integration\
    ```
    Create the `gamestate_integration` folder if it doesn't exist.
 
+4. Copy `gamestate_integration_d2reminders.cfg` into that folder.
+
 ![DotaFolder](dev_assets.o/gamestatePath.png?raw=true "Gamestate path")
 
-> **Note:** The CFG file is also included in the downloaded ZIP from the release server.
+</details>
 
 ---
 
@@ -118,12 +129,18 @@ d2r-electron/
 ├── helpers/
 │   ├── soundPlay.js         # Audio queue and cross-platform playback (afplay / PowerShell)
 │   ├── updater.js           # Auto-updater setup and update-downloaded dialog
+│   ├── gsiSetup.js          # First-run GSI config installer (Windows registry + file copy)
 │   └── ga4.js               # Google Analytics 4 event tracking
 │
 ├── home/
 │   ├── home.html            # Settings UI — toggles, delay inputs, volume slider
 │   ├── home.js              # Renderer JS — syncs UI state with electron-store
 │   └── home.css             # Styles
+│
+├── tests/                   # Jest unit tests
+│   ├── reminders.test.js    # Timing logic for all reminder types
+│   ├── game.test.js         # Event orchestration, deduplication, state tracking
+│   └── gsiSetup.test.js     # GSI installer — registry, fallback, file ops
 │
 ├── sound/                   # MP3 files for each reminder
 ├── assets/                  # App icon and installer assets
@@ -189,7 +206,11 @@ flowchart TD
    npm install
    npm run dev
    ```
-4. Make your changes, then open a Pull Request against `master`
+4. Run the test suite before pushing:
+   ```bash
+   npm test
+   ```
+5. Open a Pull Request against `master` — CI will run the tests automatically and must pass before merging
 
 Releases are handled automatically — merging to `master` triggers the GitHub Actions workflow that builds and publishes a new version.
 
@@ -209,7 +230,7 @@ Releases are handled automatically — merging to `master` triggers the GitHub A
 - [ ] Custom user-defined reminders
 - [ ] Optional reminders while spectating
 - [ ] App demo and installation video
-- [ ] Tests
+- [x] Tests
 
 ---
 

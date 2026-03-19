@@ -1,10 +1,10 @@
 {
   "name": "d2r-electron",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Dota 2 Reminders - Electron",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "electron .",
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -22,7 +22,12 @@
     "@electron-forge/maker-zip": "^6.0.3",
     "@electron-forge/publisher-github": "^6.0.3",
     "electron": "^21.3.0",
+    "jest": "^30.3.0",
     "shelljs": "^0.8.5"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/tests/**/*.test.js"]
   },
   "dependencies": {
     "axios": "^1.2.0",
